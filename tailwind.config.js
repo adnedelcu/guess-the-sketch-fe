@@ -13,7 +13,7 @@ export default {
   daisyui: {
     themes: [
       "business",
-      "retro"
+      "nord"
     ]
   },
   darkMode: ['selector', '[data-theme="business"]']

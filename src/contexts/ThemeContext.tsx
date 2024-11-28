@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-type Theme = 'retro' | 'business'
+type Theme = 'nord' | 'business'
 
 interface ThemeContextType {
   theme: Theme
@@ -14,9 +14,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme') as Theme
       if (saved) return saved
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'business' : 'retro'
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'business' : 'nord'
     }
-    return 'retro'
+    return 'nord'
   })
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'retro' ? 'business' : 'retro')
+    setTheme(prev => prev === 'nord' ? 'business' : 'nord')
   }
 
   return (
