@@ -10,5 +10,12 @@ export default {
   plugins: [
     require('daisyui'),
   ],
+  daisyui: {
+    themes: [
+      "business",
+      "retro"
+    ]
+  },
+  darkMode: ['selector', '[data-theme="business"]']
 }
 
