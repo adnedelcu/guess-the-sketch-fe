@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 
-type User = {
+export type User = {
   _id: string
   firstName: string
   lastName: string
@@ -8,13 +8,13 @@ type User = {
   birthday: Date
 }
 
-type AuthContextType = {
+export type AuthContextType = {
   user: User | null
   login: (token: string, user: User) => void
   logout: () => void
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)

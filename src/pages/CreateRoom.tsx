@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { generateRoomCode, createRoom } from '../utils/roomUtils'
+import { generateRoomCode, createRoom, Player } from '../utils/roomUtils'
 
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState('')
-  const [maxPlayers, setMaxPlayers] = useState('4')
+  const [maxPlayers, setMaxPlayers] = useState(4)
   const [isPrivate, setIsPrivate] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const navigate = useNavigate()
@@ -21,7 +21,7 @@ export default function CreateRoom() {
     setIsCreating(true)
     try {
       const roomCode = generateRoomCode()
-      createRoom(roomCode, user.id)
+      createRoom(roomCode, maxPlayers, Player.createFromUser(user))
       navigate(`/lobby/${roomCode}`)
     } catch (error) {
       console.error('Failed to create room:', error)
@@ -58,7 +58,7 @@ export default function CreateRoom() {
             <select
               className="select select-bordered"
               value={maxPlayers}
-              onChange={(e) => setMaxPlayers(e.target.value)}
+              onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
             >
               <option value="2">2 Players</option>
               <option value="3">3 Players</option>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { roomExists, joinRoom } from '../utils/roomUtils'
+import { roomExists, joinRoom, Player } from '../utils/roomUtils'
 
 export default function JoinRoom() {
   const [roomCode, setRoomCode] = useState('')
@@ -27,7 +27,7 @@ export default function JoinRoom() {
         return
       }
 
-      const joined = joinRoom(formattedCode, user._id)
+      const joined = joinRoom(formattedCode, Player.createFromUser(user))
       if (joined) {
         navigate(`/lobby/${formattedCode}`)
       } else {
