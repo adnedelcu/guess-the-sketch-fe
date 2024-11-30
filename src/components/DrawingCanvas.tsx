@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, TouchEvent, MouseEvent } from 'react'
 import { socket } from '../utils/roomUtils'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -56,10 +56,22 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
     })
   }, [])
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>|React.TouchEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true)
     setIsNewLine(true)
-    draw(e)
+    const rect = canvasRef.current?.getBoundingClientRect()
+    const x = e.clientX - (rect?.left ?? 0)
+    const y = e.clientY - (rect?.top ?? 0)
+
+    draw(x, y)
+  }
+
+  const handleDraw = (e: MouseEvent<HTMLCanvasElement>) => {
+    const rect = canvasRef.current?.getBoundingClientRect()
+    const x = e.clientX - (rect?.left ?? 0)
+    const y = e.clientY - (rect?.top ?? 0)
+
+    draw(x, y)
   }
 
   const stopDrawing = () => {
@@ -69,7 +81,32 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
     }
   }
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>|React.TouchEvent<HTMLCanvasElement>) => {
+  const startDrawingTouch = (e: TouchEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true)
+    setIsNewLine(true)
+    const rect = canvasRef.current?.getBoundingClientRect()
+    const x = e.touches.item(0).clientX - (rect?.left ?? 0);
+    const y = e.touches.item(0).clientY - (rect?.top ?? 0);
+
+    draw(x, y)
+  }
+
+  const handleDrawTouch = (e: TouchEvent<HTMLCanvasElement>): void => {
+    const rect = canvasRef.current?.getBoundingClientRect()
+    const x = e.touches.item(0).clientX - (rect?.left ?? 0);
+    const y = e.touches.item(0).clientY - (rect?.top ?? 0);
+
+    draw(x, y)
+  }
+
+  const stopDrawingTouch = () => {
+    if (isDrawing) {
+      setIsDrawing(false)
+      setIsNewLine(true)
+    }
+  }
+
+  const draw = (x: number, y: number) => {
     if (!isDrawing) return
 
     const canvas = canvasRef.current
@@ -78,17 +115,6 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
       ctx.strokeStyle = currentColor
       ctx.lineWidth = 2
       ctx.lineCap = 'round'
-
-      const rect = canvas?.getBoundingClientRect()
-      let x = 0, y = 0;
-      if (e instanceof MouseEvent) {
-        x = e.clientX - (rect?.left ?? 0)
-        y = e.clientY - (rect?.top ?? 0)
-      }
-      if (e instanceof TouchEvent) {
-        x = (e as React.TouchEvent).touches.item(0).clientX - (rect?.left ?? 0);
-        y = (e as React.TouchEvent).touches.item(0).clientY - (rect?.top ?? 0);
-      }
 
       if (isNewLine) {
         ctx.beginPath()
@@ -135,10 +161,10 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
         onMouseDown={startDrawing}
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
-        onMouseMove={draw}
-        onTouchStart={startDrawing}
-        onTouchMove={draw}
-        onTouchEnd={stopDrawing}
+        onMouseMove={handleDraw}
+        onTouchStart={startDrawingTouch}
+        onTouchMove={handleDrawTouch}
+        onTouchEnd={stopDrawingTouch}
         className="border-2 border-accent rounded-lg cursor-crosshair bg-base-100"
         aria-label="Drawing canvas"
       />
