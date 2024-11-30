@@ -1,4 +1,34 @@
 import { User } from "../contexts/AuthContext";
+import { io } from 'socket.io-client';
+
+const WS_URL = import.meta.env.VITE_API_URL;
+export const socket = io(WS_URL)
+socket.on('connect', function () {
+  console.log('Connected');
+
+  socket.emit('events', { test: 'test' });
+  socket.emit('identity', 0, (response: any) =>
+    console.log('Identity:', response),
+  );
+});
+socket.on('createRoom', function (data) {
+  console.log('createRoom', data);
+});
+socket.on('joinRoom', function (data) {
+  console.log('joinRoom', data);
+});
+socket.on('leaveRoom', function (data) {
+  console.log('leaveRoom', data);
+});
+socket.on('events', function (data) {
+  console.log('event', data);
+});
+socket.on('exception', function (data) {
+  console.log('event', data);
+});
+socket.on('disconnect', function() {
+  console.log('Disconnected');
+});
 
 export class Player {
   _id: string = '';
@@ -34,17 +64,72 @@ export class Player {
       false
     )
   }
+
+  static fromObject(player: any): Player {
+    return new Player(
+      player._id,
+      player.firstName,
+      player.lastName,
+      player.email,
+      player.birthday,
+      player.ready,
+    )
+  }
 }
 
 export class Room {
+  code: string = ''
+  name: string = ''
+  isPrivate: boolean = false
+  hasStarted: boolean = false
   owner: Player = new Player()
   maxPlayers: number = 0
-  players: Player[] = []
+  canvas: string = ''
+  players: Map<string, Player> = new Map()
 
-  constructor(owner: Player = new Player(), maxPlayers: number = 0, players: Player[] = []) {
+  constructor(
+    code: string = '',
+    name: string = '',
+    isPrivate: boolean = false,
+    hasStarted: boolean = false,
+    owner: Player = new Player(),
+    maxPlayers: number = 0,
+    canvas: string = '',
+    players: Map<string, Player> = new Map()
+  ) {
+    this.code = code
+    this.name = name
+    this.isPrivate = isPrivate
+    this.hasStarted = hasStarted
     this.owner = owner
     this.maxPlayers = maxPlayers
+    this.canvas = canvas
     this.players = players
+  }
+
+  static fromObject(room: any): Room {
+    const players = new Map();
+    for (let playerId in room.players) {
+      players.set(playerId, room.players[playerId]);
+    }
+
+    return new Room(
+      room.code,
+      room.name,
+      room.isPrivate,
+      room.hasStarted,
+      room.owner,
+      room.maxPlayers,
+      room.canvas,
+      players,
+    );
+  }
+
+  toPlain(): object {
+    return {
+      ...this,
+      players: Object.fromEntries(this.players.entries())
+    }
   }
 }
 
@@ -57,34 +142,22 @@ export function generateRoomCode(): string {
   return result
 }
 
-// Simulate a database of rooms
-const rooms = new Map<string, Room>()
-
-export function createRoom(roomCode: string, maxPlayers: number, player: Player): void {
-  rooms.set(roomCode, new Room(player, maxPlayers, [player]))
-  console.log(roomCode, rooms);
+export function createRoom(
+  roomCode: string,
+  roomName: string,
+  isPrivate: boolean,
+  maxPlayers: number,
+  player: Player
+): void {
+  const room = new Room(
+    roomCode,
+    roomName,
+    isPrivate,
+    false,
+    player,
+    maxPlayers,
+    '',
+    new Map<string, Player>().set(player._id, player)
+  );
+  socket.emit('createRoom', { code: roomCode, room: room.toPlain() })
 }
-
-export function roomExists(roomCode: string): boolean {
-  console.log(rooms, roomCode)
-  if (!rooms.has(roomCode)) {
-    return false;
-  }
-
-  const room = rooms.get(roomCode) || new Room();
-  return room.maxPlayers > room.players.length;
-}
-
-export function joinRoom(roomCode: string, player: Player): boolean {
-  const room = rooms.get(roomCode)
-  if (room && !room.players.includes(player)) {
-    room.players.push(player)
-    return true
-  }
-  return false
-}
-
-export function getRoom(roomCode: string): Room|undefined {
-  return rooms.get(roomCode);
-}
-

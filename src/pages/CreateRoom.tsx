@@ -21,7 +21,7 @@ export default function CreateRoom() {
     setIsCreating(true)
     try {
       const roomCode = generateRoomCode()
-      createRoom(roomCode, maxPlayers, Player.createFromUser(user))
+      createRoom(roomCode, roomName, isPrivate, maxPlayers, Player.createFromUser(user))
       navigate(`/lobby/${roomCode}`)
     } catch (error) {
       console.error('Failed to create room:', error)

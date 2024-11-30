@@ -1,4 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
+import { socket } from '../utils/roomUtils'
+import { useAuth } from '../contexts/AuthContext'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -16,21 +18,42 @@ const COLORS = [
   '#800080', // Purple
 ]
 
-export function DrawingCanvas() {
+export function DrawingCanvas({ handleUpdateCanvas }: any) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [isNewLine, setIsNewLine] = useState(true)
   const [currentColor, setCurrentColor] = useState('#000000')
+  const { user } = useAuth()
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (canvas) {
       const ctx = canvas.getContext('2d')
       if (ctx) {
+        console.error('initialising canvas');
         ctx.fillStyle = '#FFFFFF'
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       }
     }
+
+    socket.on('updateRoomCanvas', (response) => {
+      if (response.playerId === user?._id) {
+        return;
+      }
+      console.log(response.room.canvas.length);
+      const canvas = canvasRef.current
+      if (canvas) {
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          console.error('updating canvas with new image');
+          const img = new Image();
+          img.src = response.room.canvas;
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+          }
+        }
+      }
+    })
   }, [])
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -40,8 +63,10 @@ export function DrawingCanvas() {
   }
 
   const stopDrawing = () => {
-    setIsDrawing(false)
-    setIsNewLine(true)
+    if (isDrawing) {
+      setIsDrawing(false)
+      setIsNewLine(true)
+    }
   }
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -66,6 +91,7 @@ export function DrawingCanvas() {
         ctx.lineTo(x, y)
         ctx.stroke()
       }
+      handleUpdateCanvas(canvas?.toDataURL());
     }
   }
 
@@ -73,8 +99,10 @@ export function DrawingCanvas() {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (ctx) {
+      console.error('clearing canvas');
       ctx.fillStyle = '#FFFFFF'
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      handleUpdateCanvas(canvas?.toDataURL());
     }
   }
 

@@ -23,7 +23,7 @@ function App() {
             <main className="flex-grow container mx-auto px-4 py-8">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/draw/:code" element={<Draw />} />
+                <Route path="/draw/:roomCode" element={<Draw />} />
                 <Route path="/how-to-play" element={<HowToPlay />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/login" element={<Login />} />
@@ -31,7 +31,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/create-room" element={<CreateRoom />} />
                 <Route path="/join-room" element={<JoinRoom />} />
-                <Route path="/lobby/:code" element={<Lobby />} />
+                <Route path="/lobby/:roomCode" element={<Lobby />} />
               </Routes>
             </main>
           </div>
