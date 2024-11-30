@@ -56,7 +56,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
     })
   }, [])
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>|React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true)
     setIsNewLine(true)
     draw(e)
@@ -69,7 +69,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
     }
   }
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>|React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return
 
     const canvas = canvasRef.current
@@ -80,8 +80,15 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
       ctx.lineCap = 'round'
 
       const rect = canvas?.getBoundingClientRect()
-      const x = e.clientX - (rect?.left ?? 0)
-      const y = e.clientY - (rect?.top ?? 0)
+      let x = 0, y = 0;
+      if (e instanceof MouseEvent) {
+        x = e.clientX - (rect?.left ?? 0)
+        y = e.clientY - (rect?.top ?? 0)
+      }
+      if (e instanceof TouchEvent) {
+        x = (e as React.TouchEvent).touches.item(0).clientX - (rect?.left ?? 0);
+        y = (e as React.TouchEvent).touches.item(0).clientY - (rect?.top ?? 0);
+      }
 
       if (isNewLine) {
         ctx.beginPath()
@@ -129,6 +136,9 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
         onMouseMove={draw}
+        onTouchStart={startDrawing}
+        onTouchMove={draw}
+        onTouchEnd={stopDrawing}
         className="border-2 border-accent rounded-lg cursor-crosshair bg-base-100"
         aria-label="Drawing canvas"
       />
