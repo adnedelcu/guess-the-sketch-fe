@@ -7,8 +7,8 @@
     { "src": "/join-room", "dest": "/" },
     { "src": "/how-to-play", "dest": "/" },
     { "src": "/leaderboard", "dest": "/" },
-    { "src": "/lobby/*", "dest": "/" },
-    { "src": "/draw/*", "dest": "/" },
+    { "src": "/lobby/(.*)", "dest": "/" },
+    { "src": "/draw/(.*)", "dest": "/" },
     { "src": "/", "dest": "/" }
   ]
 }
