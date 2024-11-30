@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import dayjs from 'dayjs'
 
 export default function Profile() {
   const { user, logout } = useAuth()
@@ -25,12 +26,20 @@ export default function Profile() {
         <h2 className="card-title text-2xl font-bold text-center text-primary justify-center">User Profile</h2>
         <div className="space-y-4">
           <div>
-            <p className="text-sm font-medium text-base-content/70">Username</p>
-            <p className="text-lg">{user.username}</p>
+            <p className="text-sm font-medium text-base-content/70">First name</p>
+            <p className="text-lg">{user.firstName}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-base-content/70">Last name</p>
+            <p className="text-lg">{user.lastName}</p>
           </div>
           <div>
             <p className="text-sm font-medium text-base-content/70">Email</p>
             <p className="text-lg">{user.email}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-base-content/70">Birthday</p>
+            <p className="text-lg">{dayjs(user.birthday).format('YYYY-MM-DD')}</p>
           </div>
           <button onClick={handleLogout} className="btn btn-outline w-full">Logout</button>
         </div>

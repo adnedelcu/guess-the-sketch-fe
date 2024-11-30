@@ -16,6 +16,7 @@ export function createRoom(roomCode: string, ownerId: string): void {
 }
 
 export function roomExists(roomCode: string): boolean {
+  console.log(rooms, roomCode)
   return rooms.has(roomCode)
 }
 

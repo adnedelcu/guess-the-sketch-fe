@@ -1,14 +1,16 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 
 type User = {
-  id: string
-  username: string
+  _id: string
+  firstName: string
+  lastName: string
   email: string
+  birthday: Date
 }
 
 type AuthContextType = {
   user: User | null
-  login: (user: User) => void
+  login: (token: string, user: User) => void
   logout: () => void
 }
 
@@ -17,13 +19,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
 
-  const login = (userData: User) => {
+  const login = (token: string, userData: User) => {
+    localStorage.setItem('token', token)
     setUser(userData)
   }
 
   const logout = () => {
     setUser(null)
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = JSON.parse(atob(token.split('.')[1]));
+      setUser(user);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

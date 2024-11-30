@@ -1,17 +1,28 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import axios from 'axios'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const navigate = useNavigate()
   const { login } = useAuth()
+  const API_URL = import.meta.env.VITE_API_URL
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    login({ id: '1', username: 'testuser', email })
-    navigate('/profile')
+    const loginDto = { email, password }
+    const response = await axios.post(`${API_URL}/auth/login`, loginDto).catch(err => {
+      setError(err.response?.data?.message || err.message)
+    })
+    if (response) {
+      const token = response.data?.token;
+      const user = JSON.parse(atob(token?.split('.')[1]))
+      login(token, user)
+      navigate('/profile')
+    }
   }
 
   return (
@@ -46,6 +57,13 @@ export default function Login() {
               required
             />
           </div>
+
+          {error && (
+            <div className="alert alert-error">
+              <span>{error}</span>
+            </div>
+          )}
+
           <button type="submit" className="btn btn-primary w-full">
             Login
           </button>

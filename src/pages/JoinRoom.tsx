@@ -27,7 +27,7 @@ export default function JoinRoom() {
         return
       }
 
-      const joined = joinRoom(formattedCode, user.id)
+      const joined = joinRoom(formattedCode, user._id)
       if (joined) {
         navigate(`/lobby/${formattedCode}`)
       } else {

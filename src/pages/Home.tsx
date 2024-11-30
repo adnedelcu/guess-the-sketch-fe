@@ -34,7 +34,7 @@ export default function Home() {
           title="Practice"
           description="Practice your drawing skills in single-player mode."
           action="Start Practice"
-          onClick={() => handleAction('/draw')}
+          onClick={() => handleAction('/draw/practice')}
         />
       </div>
     </div>

@@ -1,18 +1,34 @@
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import axios from 'axios'
 
 export default function Register() {
-  const [username, setUsername] = useState('')
+  const API_URL = import.meta.env.VITE_API_URL
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [birthday, setBirthday] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
   const { login } = useAuth()
+  const maxDate = dayjs().subtract(18, 'year').toDate().toJSON().split('T')[0]
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    login({ id: '1', username, email })
-    navigate('/profile')
+    setError('')
+    const registerDto = { firstName, lastName, email, password, birthday }
+    const response = await axios.post(`${API_URL}/auth/register`, registerDto).catch(err => {
+      setError(err.response?.data?.message || err.message)
+    })
+    if (response) {
+      const token = response.data?.token
+      const user = JSON.parse(atob(token?.split('.')[1]))
+      login(token, user)
+      navigate('/profile')
+    }
   }
 
   return (
@@ -23,14 +39,41 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Username</span>
+              <span className="label-text">First name</span>
             </label>
             <input
               type="text"
-              placeholder="Choose a username"
+              placeholder="Enter your first name"
               className="input input-bordered"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Last name</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your last name"
+              className="input input-bordered"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Birthday</span>
+            </label>
+            <input
+              type="date"
+              placeholder="Enter your birthday"
+              className="input input-bordered"
+              value={birthday}
+              max={maxDate}
+              onChange={(e) => setBirthday(e.target.value)}
               required
             />
           </div>
@@ -60,6 +103,13 @@ export default function Register() {
               required
             />
           </div>
+
+          {error && (
+            <div className="alert alert-error">
+              <span>{error}</span>
+            </div>
+          )}
+
           <button type="submit" className="btn btn-primary w-full">
             Register
           </button>
