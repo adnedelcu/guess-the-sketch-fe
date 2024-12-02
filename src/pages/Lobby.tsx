@@ -63,7 +63,7 @@ export default function Lobby() {
       setChatHistory(room.chatHistory);
 
       if (room.chatHistory[room.chatHistory.length-1].buzz) {
-        const buzz = new Audio('/public/buzz.mp3');
+        const buzz = new Audio('/buzz.mp3');
         buzz.play();
         setAnimatePhone(true)
         setTimeout(() => setAnimatePhone(false), 500)
