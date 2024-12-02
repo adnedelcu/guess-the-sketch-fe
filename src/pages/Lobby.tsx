@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ChatEntry, Player, Room, socket } from '../utils/roomUtils'
@@ -8,7 +8,9 @@ export default function Lobby() {
   const { roomCode } = useParams<{ roomCode: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const chatHistoryRef = useRef(null)
   const [error, setError] = useState('');
+  const [animatePhone, setAnimatePhone] = useState(false)
   const [room, setRoom] = useState<Room>(new Room())
   const [players, setPlayers] = useState<Player[]>([])
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([])
@@ -64,6 +66,16 @@ export default function Lobby() {
       if (room.chatHistory[room.chatHistory.length-1].buzz) {
         const buzz = new Audio('/public/buzz.mp3');
         buzz.play();
+        setAnimatePhone(true)
+        setTimeout(() => setAnimatePhone(false), 500)
+      }
+      try {
+        const buffer = document.getElementById("chatHistory") || { scrollTop: 0, scrollHeight: 0 };
+        console.log(buffer.scrollTop, buffer.scrollHeight);
+        buffer.scrollTop += 100;
+        console.log(buffer.scrollTop, buffer.scrollHeight);
+      } catch (err) {
+        console.log(err);
       }
     })
   }, [user, roomCode, navigate])
@@ -162,11 +174,11 @@ export default function Lobby() {
                 </div>
               ))}
             </div>
-            <div className="mockup-phone mx-auto">
+            <div className={`mockup-phone mx-auto ${animatePhone ? 'animate-wiggle' : ''}`}>
               <div className="camera"></div>
               <div className="display">
                 <div className="artboard artboard-demo phone-3">
-                  <div className="w-full chats overflow-auto">
+                  <div className="h-full w-full chats overflow-auto content-end" id="chatHistory">
                     {chatHistory.map((entry, key) => {
                       const player = players.find(player => player._id == entry.playerId) || new Player('', 'Unknown', 'Player', 'unknown.player@guess-the-sketch.io');
 
