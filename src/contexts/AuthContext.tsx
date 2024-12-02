@@ -32,8 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      const user = JSON.parse(atob(token.split('.')[1]));
-      setUser(user);
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (((new Date()).getTime() / 1000) >= payload.exp) {
+        logout();
+        return;
+      }
+
+      setUser(payload);
     }
   }, []);
 

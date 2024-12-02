@@ -30,6 +30,13 @@ socket.on('disconnect', function() {
   console.log('Disconnected');
 });
 
+export class ChatEntry {
+  playerId: string = '';
+  message: string = '';
+  date: Date = new Date();
+  delivered: boolean = false;
+}
+
 export class Player {
   _id: string = '';
   firstName: string = '';
@@ -86,6 +93,7 @@ export class Room {
   maxPlayers: number = 0
   canvas: string = ''
   players: Map<string, Player> = new Map()
+  chatHistory: ChatEntry[] = []
 
   constructor(
     code: string = '',
@@ -95,7 +103,8 @@ export class Room {
     owner: Player = new Player(),
     maxPlayers: number = 0,
     canvas: string = '',
-    players: Map<string, Player> = new Map()
+    players: Map<string, Player> = new Map(),
+    chatHistory: ChatEntry[] = [],
   ) {
     this.code = code
     this.name = name
@@ -105,6 +114,7 @@ export class Room {
     this.maxPlayers = maxPlayers
     this.canvas = canvas
     this.players = players
+    this.chatHistory = chatHistory
   }
 
   static fromObject(room: any): Room {
@@ -122,6 +132,7 @@ export class Room {
       room.maxPlayers,
       room.canvas,
       players,
+      room.chatHistory,
     );
   }
 

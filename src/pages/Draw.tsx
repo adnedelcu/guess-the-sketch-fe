@@ -46,6 +46,12 @@ export default function Draw() {
     socket.emit('updateRoomCanvas', { room: room.toPlain(), canvas: canvasData, playerId: user._id });
   };
 
+  const handleLeave = () => {
+    socket.emit('leaveRoom', { code: room.code, player: user }, () => {
+      navigate('/join-room');
+    });
+  }
+
   return (
     <div className="space-y-8">
       {error && (
@@ -64,7 +70,17 @@ export default function Draw() {
           <hr />
           <ul>
             {players.map((player, key) => (
-              <li key={key}>{player.firstName} {player.lastName}{player._id === user._id ? ' (You)' : ''}</li>
+              <li key={key}>
+                {player.firstName} {player.lastName}
+                {player._id === user._id && (
+                  <>
+                    <span>(You)</span>
+                    <button onClick={() => handleLeave()} className="btn btn-danger">
+                      Leave room
+                    </button>
+                  </>
+                )}
+              </li>
             ))}
           </ul>
         </div>

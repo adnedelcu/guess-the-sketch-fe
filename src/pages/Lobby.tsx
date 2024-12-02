@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Player, Room, socket } from '../utils/roomUtils'
+import { ChatEntry, Player, Room, socket } from '../utils/roomUtils'
+import { formatDateTime } from '../utils/dateUtils'
 
 export default function Lobby() {
   const { roomCode } = useParams<{ roomCode: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [error, setError] = useState('');
-  const [players, setPlayers] = useState<Player[]>([])
-  const [inviteEmail, setInviteEmail] = useState('')
   const [room, setRoom] = useState<Room>(new Room())
+  const [players, setPlayers] = useState<Player[]>([])
+  const [chatHistory, setChatHistory] = useState<ChatEntry[]>([])
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     if (!user) {
@@ -34,6 +36,7 @@ export default function Lobby() {
       const room = Room.fromObject(response.room);
       setRoom(room)
       setPlayers(Object.values(response.room.players))
+      setChatHistory(room.chatHistory)
 
       if (room.hasStarted) {
         navigate(`/draw/${roomCode}`)
@@ -45,10 +48,17 @@ export default function Lobby() {
       console.log(response.room, room);
       setRoom(room)
       setPlayers(Object.values(response.room.players))
+      setChatHistory(room.chatHistory)
 
       if (room.hasStarted) {
         navigate(`/draw/${roomCode}`);
       }
+    })
+
+    socket.on('updateChatHistory', (response: any) => {
+      const room = Room.fromObject(response.room);
+      console.log(response.room, room);
+      setChatHistory(room.chatHistory);
     })
   }, [user, roomCode, navigate])
 
@@ -74,10 +84,12 @@ export default function Lobby() {
     });
   }
 
-  const handleInvite = (e: React.FormEvent) => {
+  const sendMessage = (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically send an invitation to the provided email
-    setInviteEmail('')
+    setMessage('')
+
+    socket.emit('sendMessage', { code: room.code, player: user, message });
   }
 
   const handleStartGame = () => {
@@ -99,7 +111,7 @@ export default function Lobby() {
         </div>
       )}
 
-      <div className="card bg-base-100 shadow-xl max-w-2xl mx-auto">
+      <div className="card bg-base-100 shadow-xl mx-auto">
         <div className="card-body">
           <h2 className="card-title text-2xl font-bold text-center text-primary justify-center">Game Lobby "{room.name}"</h2>
           <div className="grid grid-cols-2">
@@ -112,7 +124,7 @@ export default function Lobby() {
               <p className="text-2xl font-mono font-bold tracking-wider">{room.owner.firstName} {room.owner.lastName}</p>
             </div>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-6 grid grid-cols-2">
             <div className="space-y-4">
               {players.map(player => (
                 <div key={player._id} className="flex justify-between items-center">
@@ -129,7 +141,7 @@ export default function Lobby() {
                         onClick={() => handleLeave()}
                         className="btn btn-danger"
                       >
-                        LeaveRoom
+                        Leave room
                       </button>
                     </div>
                   ) : (
@@ -138,16 +150,40 @@ export default function Lobby() {
                 </div>
               ))}
             </div>
-            <form onSubmit={handleInvite} className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Invite player by email"
-                className="input input-bordered flex-1"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-              />
-              <button type="submit" className="btn btn-primary">Invite</button>
-            </form>
+            <div className="mockup-phone mx-auto">
+              <div className="camera"></div>
+              <div className="display">
+                <div className="artboard artboard-demo phone-3">
+                  <div className="w-full chats overflow-auto">
+                    {chatHistory.map((entry, key) => {
+                      const player = players.find(player => player._id == entry.playerId) || new Player('', 'Unknown', 'Player', 'unknown.player@guess-the-sketch.io');
+
+                      return (
+                        <div className={`chat ${entry.playerId === user._id ? 'chat-end' : 'chat-start'}`} key={key}>
+                          <div className="chat-image avatar">
+                            <div className="w-10 rounded-full">
+                              <img src={`https://www.gravatar.com/avatar/${player.email}`} alt="" />
+                            </div>
+                          </div>
+                          <div className="chat-header">
+                            {player.firstName} {player.lastName}
+                            <time className="text-xs opacity-50">{formatDateTime(entry.date)}</time>
+                          </div>
+                          <div className="chat-bubble">{entry.message}</div>
+                          <div className="chat-footer opacity-50">{entry.delivered}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="pb-6 w-full self-end form-control">
+                  <div className="input-group">
+                    <input type="text" placeholder="Type here" className="input input-bordered max-w-xs" disabled={!socket} value={message} onChange={(event) => setMessage(event.target.value)} />
+                    <button type="button" className="btn btn-primary" disabled={!socket || message.trim().length === 0} onClick={sendMessage}>Submit✨</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             {isOwner && (
               <button
                 onClick={handleStartGame}
