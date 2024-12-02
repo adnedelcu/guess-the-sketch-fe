@@ -13,6 +13,7 @@ export default function Lobby() {
   const [players, setPlayers] = useState<Player[]>([])
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([])
   const [message, setMessage] = useState('')
+  const [allowedToBuzz, setAllowedToBuzz] = useState(true)
 
   useEffect(() => {
     if (!user) {
@@ -59,6 +60,11 @@ export default function Lobby() {
       const room = Room.fromObject(response.room);
       console.log(response.room, room);
       setChatHistory(room.chatHistory);
+
+      if (room.chatHistory[room.chatHistory.length-1].buzz) {
+        const buzz = new Audio('/public/buzz.mp3');
+        buzz.play();
+      }
     })
   }, [user, roomCode, navigate])
 
@@ -90,6 +96,12 @@ export default function Lobby() {
     setMessage('')
 
     socket.emit('sendMessage', { code: room.code, player: user, message });
+  }
+
+  const sendBuzz = () => {
+    setAllowedToBuzz(false);
+    setTimeout(() => setAllowedToBuzz(true), 1000);
+    socket.emit('sendMessage', { code: room.code, player: user, buzz: true });
   }
 
   const handleStartGame = () => {
@@ -169,7 +181,8 @@ export default function Lobby() {
                             {player.firstName} {player.lastName}
                             <time className="text-xs opacity-50">{formatDateTime(entry.date)}</time>
                           </div>
-                          <div className="chat-bubble">{entry.message}</div>
+                          {entry.message && <div className="chat-bubble">{entry.message}</div>}
+                          {entry.buzz && <div className="chat-bubble chat-bubble-error">!!!BUZZ!!!</div>}
                           <div className="chat-footer opacity-50">{entry.delivered}</div>
                         </div>
                       )
@@ -180,6 +193,7 @@ export default function Lobby() {
                   <div className="input-group">
                     <input type="text" placeholder="Type here" className="input input-bordered max-w-xs" disabled={!socket} value={message} onChange={(event) => setMessage(event.target.value)} />
                     <button type="button" className="btn btn-primary" disabled={!socket || message.trim().length === 0} onClick={sendMessage}>Submit✨</button>
+                    <button type="button" className="btn btn-primary" disabled={!socket || !allowedToBuzz} onClick={sendBuzz}>🐝</button>
                   </div>
                 </div>
               </div>

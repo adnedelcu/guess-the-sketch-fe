@@ -35,6 +35,7 @@ export class ChatEntry {
   message: string = '';
   date: Date = new Date();
   delivered: boolean = false;
+  buzz: boolean = false;
 }
 
 export class Player {
