@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ChatEntry, Player, Room, socket } from '../utils/roomUtils'
@@ -8,7 +8,6 @@ export default function Lobby() {
   const { roomCode } = useParams<{ roomCode: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
-  const chatHistoryRef = useRef(null)
   const [error, setError] = useState('');
   const [animatePhone, setAnimatePhone] = useState(false)
   const [room, setRoom] = useState<Room>(new Room())
