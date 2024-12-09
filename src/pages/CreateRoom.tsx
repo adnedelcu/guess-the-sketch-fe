@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { generateRoomCode, createRoom, Player } from '../utils/roomUtils'
+import toast from 'react-hot-toast'
 
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState('')
@@ -24,7 +25,7 @@ export default function CreateRoom() {
       createRoom(roomCode, roomName, isPrivate, maxPlayers, Player.createFromUser(user))
       navigate(`/lobby/${roomCode}`)
     } catch (error) {
-      console.error('Failed to create room:', error)
+      toast.error(`Failed to create room: ${error}`);
     } finally {
       setIsCreating(false)
     }

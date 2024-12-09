@@ -42,7 +42,6 @@ export default function Draw() {
   if (!user || !roomCode) return null;
 
   const handleUpdateCanvas = (canvasData: string) => {
-    console.log(canvasData.length);
     socket.emit('updateRoomCanvas', { room: room.toPlain(), canvas: canvasData, playerId: user._id });
   };
 

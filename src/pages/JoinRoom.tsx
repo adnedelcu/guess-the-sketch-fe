@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Player, Room, socket } from '../utils/roomUtils'
 import { ErrorCodes } from '../utils/errorCodes'
+import toast from 'react-hot-toast'
 
 export default function JoinRoom() {
   const [rooms, setRooms] = useState([])
@@ -20,7 +21,7 @@ export default function JoinRoom() {
         return;
       }
 
-      console.log(response.rooms);
+      // console.log(response.rooms);
 
       setRooms(response.rooms.map((room: object) => Room.fromObject(room)))
     });
@@ -57,7 +58,7 @@ export default function JoinRoom() {
         navigate(`/lobby/${formattedCode}`)
       })
     } catch (error) {
-      console.error('Failed to join room:', error)
+      toast.error(`Failed to join room: ${error}`)
       setError('An error occurred while joining the room.')
     } finally {
       setIsJoining(false)

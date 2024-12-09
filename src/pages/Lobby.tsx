@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ChatEntry, Player, Room, socket } from '../utils/roomUtils'
 import { formatDateTime } from '../utils/dateUtils'
+import toast from 'react-hot-toast'
 
 export default function Lobby() {
   const { roomCode } = useParams<{ roomCode: string }>()
@@ -45,15 +46,11 @@ export default function Lobby() {
       }
     });
 
-    socket.on('toggleReady', (response: any) => {
-      console.log('toggleReady', response);
-    });
-
     socket.on('updateRoom', (response: any) => {
       const room = Room.fromObject(response.room);
-      console.log(response.room, room);
+      // console.log(response.room, room);
       setRoom(room)
-      console.log(Object.values(response.room.players));
+      // console.log(Object.values(response.room.players));
       setPlayers(Object.values(response.room.players))
       setChatHistory(room.chatHistory)
 
@@ -64,7 +61,7 @@ export default function Lobby() {
 
     socket.on('updateChatHistory', (response: any) => {
       const room = Room.fromObject(response.room);
-      console.log(response.room, room);
+      // console.log(response.room, room);
       setChatHistory(room.chatHistory);
 
       if (room.chatHistory[room.chatHistory.length-1].buzz) {
@@ -75,11 +72,11 @@ export default function Lobby() {
       }
       try {
         const buffer = document.getElementById("chatHistory") || { scrollTop: 0, scrollHeight: 0 };
-        console.log(buffer.scrollTop, buffer.scrollHeight);
+        // console.log(buffer.scrollTop, buffer.scrollHeight);
         buffer.scrollTop += 100;
-        console.log(buffer.scrollTop, buffer.scrollHeight);
+        // console.log(buffer.scrollTop, buffer.scrollHeight);
       } catch (err) {
-        console.log(err);
+        toast.error(JSON.stringify(err));
       }
     })
   }, [user, roomCode, navigate])
@@ -88,7 +85,7 @@ export default function Lobby() {
 
   const handleReady = () => {
     socket.emit('toggleReady', { code: room.code, playerId: user._id }, (response: any) => {
-      console.log(response);
+      // console.log(response);
       if (response.error) {
         // navigate('/join-room')
 
