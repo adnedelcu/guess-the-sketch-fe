@@ -41,19 +41,24 @@ export default function Lobby() {
       setChatHistory(room.chatHistory)
 
       if (room.hasStarted) {
-        navigate(`/draw/${roomCode}`)
+        navigate(`/game/${roomCode}`)
       }
+    });
+
+    socket.on('toggleReady', (response: any) => {
+      console.log('toggleReady', response);
     });
 
     socket.on('updateRoom', (response: any) => {
       const room = Room.fromObject(response.room);
       console.log(response.room, room);
       setRoom(room)
+      console.log(Object.values(response.room.players));
       setPlayers(Object.values(response.room.players))
       setChatHistory(room.chatHistory)
 
       if (room.hasStarted) {
-        navigate(`/draw/${roomCode}`);
+        navigate(`/game/${roomCode}`);
       }
     })
 
@@ -82,7 +87,8 @@ export default function Lobby() {
   if (!user || !roomCode) return null
 
   const handleReady = () => {
-    socket.emit('toggleReady', { room, player: user }, (response: any) => {
+    socket.emit('toggleReady', { code: room.code, playerId: user._id }, (response: any) => {
+      console.log(response);
       if (response.error) {
         // navigate('/join-room')
 
@@ -118,7 +124,7 @@ export default function Lobby() {
   const handleStartGame = () => {
     if (players.every(player => player.ready)) {
       socket.emit('startGame', { code: roomCode }, () => {
-        navigate(`/draw/${roomCode}`)
+        navigate(`/game/${roomCode}`)
       });
       // Here you would navigate to the game page or start the game logic
     }

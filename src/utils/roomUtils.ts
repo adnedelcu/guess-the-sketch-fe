@@ -2,7 +2,8 @@ import { User } from "../contexts/AuthContext";
 import { io } from 'socket.io-client';
 
 const WS_URL = import.meta.env.VITE_API_URL;
-export const socket = io(WS_URL)
+export const socket = io(WS_URL);
+
 socket.on('connect', function () {
   console.log('Connected');
 
@@ -28,7 +29,80 @@ socket.on('exception', function (data) {
 });
 socket.on('disconnect', function() {
   console.log('Disconnected');
+  socket.off('createRoom');
+  socket.off('joinRoom');
+  socket.off('toggleReady');
+  socket.off('updateRoom');
+  socket.off('updateRoomCanvas');
+  socket.off('updateChatHistory');
 });
+
+export enum Stage {
+  Draw = 'draw',
+  Guess = 'guess',
+}
+
+export class Game {
+  stages: Map<string, GameStage>;
+  activeStage: string;
+
+  constructor(
+    stages: Map<string, GameStage> = new Map(),
+    activeStage: string = '',
+  ) {
+    this.stages = stages;
+    this.activeStage = activeStage;
+  }
+
+  static fromObject(gameObj: any): Game {
+    const game = new Game();
+    for (const stageId in gameObj.stages) {
+      game.stages.set(stageId, GameStage.fromObject(gameObj.stages[stageId]));
+    }
+    game.activeStage = game.activeStage;
+
+    return game;
+  }
+
+  toPlain() {
+    return {
+      activeStage: this.activeStage,
+      stages: Object.fromEntries(this.stages.entries()),
+    }
+  }
+}
+
+export class GameStage {
+  stage: Stage;
+  player: Player;
+  word: string;
+  canvas: string;
+  nextStage?: string;
+
+  constructor(
+    stage: Stage,
+    player: Player,
+    word: string = '',
+    canvas: string = '',
+    nextStage: string|undefined = undefined,
+  ) {
+    this.stage = stage;
+    this.player = player;
+    this.word = word;
+    this.canvas = canvas;
+    this.nextStage = nextStage;
+  }
+
+  static fromObject(gameStage: any): GameStage {
+    return new GameStage(
+      gameStage.stage,
+      gameStage.player instanceof Player ? gameStage.player : Player.fromObject(gameStage.player),
+      gameStage.word,
+      gameStage.canvas,
+      gameStage.nextStage,
+    );
+  }
+}
 
 export class ChatEntry {
   playerId: string = '';
@@ -95,6 +169,7 @@ export class Room {
   canvas: string = ''
   players: Map<string, Player> = new Map()
   chatHistory: ChatEntry[] = []
+  game: Game = new Game()
 
   constructor(
     code: string = '',
@@ -106,6 +181,7 @@ export class Room {
     canvas: string = '',
     players: Map<string, Player> = new Map(),
     chatHistory: ChatEntry[] = [],
+    game: Game = new Game(),
   ) {
     this.code = code
     this.name = name
@@ -116,6 +192,7 @@ export class Room {
     this.canvas = canvas
     this.players = players
     this.chatHistory = chatHistory
+    this.game = game
   }
 
   static fromObject(room: any): Room {
@@ -134,13 +211,26 @@ export class Room {
       room.canvas,
       players,
       room.chatHistory,
+      Game.fromObject(room.game)
     );
+  }
+
+  currentStage(): GameStage|undefined {
+    return this.game.stages.get(this.game.activeStage);
+  }
+
+  nextStage(): GameStage|undefined {
+    if (!this.currentStage()?.nextStage) {
+      return;
+    }
+    return this.game.stages.get(this.currentStage()?.nextStage!);
   }
 
   toPlain(): object {
     return {
       ...this,
-      players: Object.fromEntries(this.players.entries())
+      players: Object.fromEntries(this.players.entries()),
+      game: this.game.toPlain(),
     }
   }
 }
@@ -169,7 +259,7 @@ export function createRoom(
     player,
     maxPlayers,
     '',
-    new Map<string, Player>().set(player._id, player)
+    new Map<string, Player>().set(player._id, player),
   );
   socket.emit('createRoom', { code: roomCode, room: room.toPlain() })
 }

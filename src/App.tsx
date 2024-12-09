@@ -3,7 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Header from './components/Header'
 import Home from './pages/Home'
-import Draw from './pages/Draw'
+import Game from './pages/Game'
 import HowToPlay from './pages/HowToPlay'
 import Leaderboard from './pages/Leaderboard'
 import Login from './pages/Login'
@@ -12,6 +12,7 @@ import Profile from './pages/Profile'
 import Lobby from './pages/Lobby'
 import CreateRoom from './pages/CreateRoom'
 import JoinRoom from './pages/JoinRoom'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
             <main className="flex-grow container mx-auto px-4 py-8">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/draw/:roomCode" element={<Draw />} />
+                <Route path="/game/:roomCode" element={<Game />} />
                 <Route path="/how-to-play" element={<HowToPlay />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/login" element={<Login />} />
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/join-room" element={<JoinRoom />} />
                 <Route path="/lobby/:roomCode" element={<Lobby />} />
               </Routes>
+              <Toaster />
             </main>
           </div>
         </AuthProvider>

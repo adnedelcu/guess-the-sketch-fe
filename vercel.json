@@ -8,7 +8,7 @@
     { "src": "/how-to-play", "dest": "/" },
     { "src": "/leaderboard", "dest": "/" },
     { "src": "/lobby/(.*)", "dest": "/" },
-    { "src": "/draw/(.*)", "dest": "/" },
+    { "src": "/game/(.*)", "dest": "/" },
     { "src": "/", "dest": "/" }
   ]
 }
