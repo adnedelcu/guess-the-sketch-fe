@@ -18,7 +18,7 @@ const COLORS = [
   '#800080', // Purple
 ]
 
-export function DrawingCanvas({ handleUpdateCanvas }: any) {
+export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [isNewLine, setIsNewLine] = useState(true)
@@ -30,7 +30,6 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
     if (canvas) {
       const ctx = canvas.getContext('2d')
       if (ctx) {
-        console.error('initialising canvas');
         ctx.fillStyle = '#FFFFFF'
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       }
@@ -40,12 +39,10 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
       if (response.playerId === user?._id) {
         return;
       }
-      console.log(response.room.canvas.length);
       const canvas = canvasRef.current
       if (canvas) {
         const ctx = canvas.getContext('2d')
         if (ctx) {
-          console.error('updating canvas with new image');
           const img = new Image();
           img.src = response.room.canvas;
           img.onload = () => {
@@ -57,6 +54,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }, [])
 
   const startDrawing = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (!allowedToDraw) return;
     setIsDrawing(true)
     setIsNewLine(true)
     const rect = canvasRef.current?.getBoundingClientRect()
@@ -67,6 +65,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const handleDraw = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (!allowedToDraw) return;
     const rect = canvasRef.current?.getBoundingClientRect()
     const x = e.clientX - (rect?.left ?? 0)
     const y = e.clientY - (rect?.top ?? 0)
@@ -75,6 +74,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const stopDrawing = () => {
+    if (!allowedToDraw) return;
     if (isDrawing) {
       setIsDrawing(false)
       setIsNewLine(true)
@@ -82,6 +82,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const startDrawingTouch = (e: TouchEvent<HTMLCanvasElement>) => {
+    if (!allowedToDraw) return;
     setIsDrawing(true)
     setIsNewLine(true)
     const rect = canvasRef.current?.getBoundingClientRect()
@@ -92,6 +93,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const handleDrawTouch = (e: TouchEvent<HTMLCanvasElement>): void => {
+    if (!allowedToDraw) return;
     const rect = canvasRef.current?.getBoundingClientRect()
     const x = e.touches.item(0).clientX - (rect?.left ?? 0);
     const y = e.touches.item(0).clientY - (rect?.top ?? 0);
@@ -100,6 +102,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const stopDrawingTouch = () => {
+    if (!allowedToDraw) return;
     if (isDrawing) {
       setIsDrawing(false)
       setIsNewLine(true)
@@ -107,6 +110,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const draw = (x: number, y: number) => {
+    if (!allowedToDraw) return;
     if (!isDrawing) return
 
     const canvas = canvasRef.current
@@ -129,10 +133,10 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
   }
 
   const clearCanvas = () => {
+    if (!allowedToDraw) return;
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (ctx) {
-      console.error('clearing canvas');
       ctx.fillStyle = '#FFFFFF'
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       handleUpdateCanvas(canvas?.toDataURL());
@@ -168,7 +172,7 @@ export function DrawingCanvas({ handleUpdateCanvas }: any) {
         className="border-2 border-accent rounded-lg cursor-crosshair bg-base-100"
         aria-label="Drawing canvas"
       />
-      <button onClick={clearCanvas} className="btn btn-primary mt-4">
+      <button onClick={clearCanvas} disabled={!allowedToDraw} className="btn btn-primary mt-4">
         Clear Canvas
       </button>
     </div>

@@ -164,6 +164,7 @@ export class Room {
   name: string = ''
   isPrivate: boolean = false
   hasStarted: boolean = false
+  isFinished: boolean = false
   owner: Player = new Player()
   maxPlayers: number = 0
   canvas: string = ''
@@ -176,6 +177,7 @@ export class Room {
     name: string = '',
     isPrivate: boolean = false,
     hasStarted: boolean = false,
+    isFinished: boolean = false,
     owner: Player = new Player(),
     maxPlayers: number = 0,
     canvas: string = '',
@@ -187,6 +189,7 @@ export class Room {
     this.name = name
     this.isPrivate = isPrivate
     this.hasStarted = hasStarted
+    this.isFinished = isFinished
     this.owner = owner
     this.maxPlayers = maxPlayers
     this.canvas = canvas
@@ -201,17 +204,26 @@ export class Room {
       players.set(playerId, room.players[playerId]);
     }
 
+    const game = new Game();
+    const gameStages = new Map();
+    for (let stageId in room.game.stages) {
+      gameStages.set(stageId, GameStage.fromObject(room.game.stages[stageId]));
+    }
+    game.stages = gameStages;
+    game.activeStage = room.game.activeStage;
+
     return new Room(
       room.code,
       room.name,
       room.isPrivate,
       room.hasStarted,
+      room.isFinished,
       room.owner,
       room.maxPlayers,
       room.canvas,
       players,
       room.chatHistory,
-      Game.fromObject(room.game)
+      game,
     );
   }
 
@@ -255,6 +267,7 @@ export function createRoom(
     roomCode,
     roomName,
     isPrivate,
+    false,
     false,
     player,
     maxPlayers,
