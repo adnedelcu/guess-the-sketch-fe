@@ -19,6 +19,8 @@ const COLORS = [
 ]
 
 export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
+  handleUpdateCanvas = handleUpdateCanvas || (() => {});
+  allowedToDraw = allowedToDraw || true;
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [isNewLine, setIsNewLine] = useState(true)

@@ -167,6 +167,8 @@ export class Room {
   isFinished: boolean = false
   owner: Player = new Player()
   maxPlayers: number = 0
+  timeForDrawing: number = 0
+  timeForGuessing: number = 0
   canvas: string = ''
   players: Map<string, Player> = new Map()
   chatHistory: ChatEntry[] = []
@@ -180,6 +182,8 @@ export class Room {
     isFinished: boolean = false,
     owner: Player = new Player(),
     maxPlayers: number = 0,
+    timeForDrawing: number = 0,
+    timeForGuessing: number = 0,
     canvas: string = '',
     players: Map<string, Player> = new Map(),
     chatHistory: ChatEntry[] = [],
@@ -192,6 +196,8 @@ export class Room {
     this.isFinished = isFinished
     this.owner = owner
     this.maxPlayers = maxPlayers
+    this.timeForDrawing = timeForDrawing
+    this.timeForGuessing = timeForGuessing
     this.canvas = canvas
     this.players = players
     this.chatHistory = chatHistory
@@ -220,6 +226,8 @@ export class Room {
       room.isFinished,
       room.owner,
       room.maxPlayers,
+      room.timeForDrawing,
+      room.timeForGuessing,
       room.canvas,
       players,
       room.chatHistory,
@@ -261,6 +269,8 @@ export function createRoom(
   roomName: string,
   isPrivate: boolean,
   maxPlayers: number,
+  timeForDrawing: number,
+  timeForGuessing: number,
   player: Player
 ): void {
   const room = new Room(
@@ -271,6 +281,8 @@ export function createRoom(
     false,
     player,
     maxPlayers,
+    timeForDrawing,
+    timeForGuessing,
     '',
     new Map<string, Player>().set(player._id, player),
   );

@@ -3,6 +3,7 @@ import { DrawingCanvas } from '../components/DrawingCanvas'
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { GameStage, Player, Room, socket, Stage } from '../utils/roomUtils';
+import dayjs from 'dayjs';
 
 export default function Game() {
   const { roomCode } = useParams<{ roomCode: string }>()
@@ -13,6 +14,8 @@ export default function Game() {
   const [room, setRoom] = useState(new Room())
   const [canvasData, setCanvasData] = useState('');
   const [guess, setGuess] = useState('');
+  const [countdownStarted, setCountdownStarted] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -35,6 +38,8 @@ export default function Game() {
       }
       const room = Room.fromObject(response.room)
       setRoom(room)
+      setTimeRemaining(room.currentStage()?.stage == Stage.Draw ? room.timeForDrawing : room.timeForGuessing);
+      setCountdownStarted(true);
       setPlayers(Object.values(response.room.players))
       setCanvasData(room.canvas);
     });
@@ -42,9 +47,28 @@ export default function Game() {
     socket.on('updateRoom', (response: any) => {
       const room = Room.fromObject(response.room);
       setRoom(room)
+      if (!countdownStarted) {
+        setTimeRemaining(room.currentStage()?.stage == Stage.Draw ? room.timeForDrawing : room.timeForGuessing);
+        setCountdownStarted(true);
+      }
       setPlayers(Object.values(response.room.players))
     });
   }, [user, roomCode, navigate])
+
+  useEffect(() => {
+    if (countdownStarted) {
+      const countdownInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+          clearInterval(countdownInterval);
+          handleAdvanceStage();
+          return;
+        }
+        setTimeRemaining(timeRemaining-1);
+      }, 1000);
+
+      return () => clearInterval(countdownInterval);
+    }
+  }, [countdownStarted, timeRemaining])
 
   if (!user || !roomCode) return null;
 
@@ -65,6 +89,8 @@ export default function Game() {
     } else {
       socket.emit('advanceStage', { code: room.code, guess });
     }
+    setTimeRemaining(0);
+    setCountdownStarted(false);
   }
 
   return (
@@ -99,6 +125,7 @@ export default function Game() {
             ) : (
               <h3>Guess the drawing</h3>
             )}
+            {timeRemaining && <p>Time left: {timeRemaining}</p>}
             <DrawingCanvas handleUpdateCanvas={handleUpdateCanvas} canvasData={canvasData} allowedToDraw={room.currentStage()?.stage == Stage.Draw && room.currentStage()?.player._id == user._id} />
             {room.currentStage()?.stage == Stage.Guess && room.currentStage()?.player._id == user._id && (
               <>

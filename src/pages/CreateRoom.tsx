@@ -7,6 +7,8 @@ import toast from 'react-hot-toast'
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState('')
   const [maxPlayers, setMaxPlayers] = useState(4)
+  const [timeForDrawing, setTimeForDrawing] = useState(60)
+  const [timeForGuessing, setTimeForGuessing] = useState(10)
   const [isPrivate, setIsPrivate] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const navigate = useNavigate()
@@ -22,7 +24,7 @@ export default function CreateRoom() {
     setIsCreating(true)
     try {
       const roomCode = generateRoomCode()
-      createRoom(roomCode, roomName, isPrivate, maxPlayers, Player.createFromUser(user))
+      createRoom(roomCode, roomName, isPrivate, maxPlayers, timeForDrawing, timeForGuessing, Player.createFromUser(user))
       navigate(`/lobby/${roomCode}`)
     } catch (error) {
       toast.error(`Failed to create room: ${error}`);
@@ -67,6 +69,42 @@ export default function CreateRoom() {
               <option value="5">5 Players</option>
               <option value="6">6 Players</option>
             </select>
+          </div>
+
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Time allocated for drawing stage (seconds)</span>
+            </label>
+            <div className="join">
+              <input
+                type="number"
+                placeholder="0"
+                className="input input-bordered"
+                min={0}
+                max={120}
+                value={timeForDrawing}
+                onChange={(e) => setTimeForDrawing(parseInt(e.target.value))}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Time allocated for guessing stage (seconds)</span>
+            </label>
+            <div className="join">
+              <input
+                type="number"
+                placeholder="0"
+                className="input input-bordered"
+                min={0}
+                max={60}
+                value={timeForGuessing}
+                onChange={(e) => setTimeForGuessing(parseInt(e.target.value))}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-control">
