@@ -3,7 +3,6 @@ import { DrawingCanvas } from '../components/DrawingCanvas'
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { GameStage, Player, Room, socket, Stage } from '../utils/roomUtils';
-import dayjs from 'dayjs';
 
 export default function Game() {
   const { roomCode } = useParams<{ roomCode: string }>()
