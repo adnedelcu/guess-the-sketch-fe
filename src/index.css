@@ -2,3 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: 'Short Stack', cursive;
+}
+
+.doodle a {
+    color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+}
+
+.doodle label {
+    display: inherit;
+}
+
+.doodle button, .doodle textarea, .doodle input, .doodle select {
+    color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+}

@@ -10,10 +10,16 @@ export default function JoinRoom() {
   const [roomCode, setRoomCode] = useState('')
   const [error, setError] = useState('')
   const [isJoining, setIsJoining] = useState(false)
+  const [canRefresh, setCanRefresh] = useState(false)
   const navigate = useNavigate()
   const { user } = useAuth()
 
   useEffect(() => {
+    getRooms();
+  }, [])
+
+  const getRooms = () => {
+    setCanRefresh(false);
     socket.emit('getRooms', {}, (response: any) => {
       if (response.error) {
         setError(response.message);
@@ -25,7 +31,10 @@ export default function JoinRoom() {
 
       setRooms(response.rooms.map((room: object) => Room.fromObject(room)))
     });
-  }, [])
+    setTimeout(() => {
+      setCanRefresh(true);
+    }, 1000);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,11 +85,12 @@ export default function JoinRoom() {
             {rooms.map((room: Room, key: any) => (
               <form onSubmit={handleSubmit} className="room grid grid-cols-4" key={key}>
                 <input type="hidden" name="code" value={room.code} />
-                <div className="col-span-2">{room.name}</div>
+                <div className="col-span-2">{room.name}{room.isFinished && ' (ended)'}</div>
                 <div className="playerCount">{room.players.size} / {room.maxPlayers}</div>
                 <div className="actions"><button className="btn btn-info">Join room</button></div>
               </form>
             ))}
+            <button className="btn" type="button" onClick={getRooms} disabled={!canRefresh}>Refresh</button>
           </div>
         </div>
 

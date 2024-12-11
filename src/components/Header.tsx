@@ -10,7 +10,7 @@ export default function Header() {
     <header className="bg-base-100 border-b border-base-300">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Logo />
-        <nav className="flex items-center space-x-4">
+        <nav className="flex items-center space-x-4 gap-3">
           <Link to="/how-to-play" className="btn btn-ghost">
             How to Play
           </Link>

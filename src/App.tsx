@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Header from './components/Header'
@@ -12,7 +13,6 @@ import Profile from './pages/Profile'
 import Lobby from './pages/Lobby'
 import CreateRoom from './pages/CreateRoom'
 import JoinRoom from './pages/JoinRoom'
-import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (

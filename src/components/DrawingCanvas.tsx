@@ -149,7 +149,7 @@ export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
         {COLORS.map((color) => (
           <button
             key={color}
-            className={`w-8 h-8 rounded-full ${
+            className={`w-8 h-8 ${
               color === currentColor ? 'ring-2 ring-primary ring-offset-2' : ''
             }`}
             style={{ backgroundColor: color }}
