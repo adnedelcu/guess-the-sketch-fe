@@ -56,17 +56,14 @@ export default function CreateRoom() {
             <label className="label">
               <span className="label-text">Maximum Players</span>
             </label>
-            <select
-              className="select select-bordered"
+            <input
+              type="number"
+              className="input input-bordered"
+              min={0}
               value={maxPlayers}
-              onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
-            >
-              <option value="2">2 Players</option>
-              <option value="3">3 Players</option>
-              <option value="4">4 Players</option>
-              <option value="5">5 Players</option>
-              <option value="6">6 Players</option>
-            </select>
+              onChange={(e) => setMaxPlayers(parseInt(e.currentTarget.value))}
+              required
+            />
           </div>
 
           <div className="form-control">
