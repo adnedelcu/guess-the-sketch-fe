@@ -18,7 +18,9 @@ const COLORS = [
   '#800080', // Purple
 ]
 
-export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
+export function DrawingCanvas({ handleUpdateCanvas, handleAdvanceStage, allowedToDraw }: any) {
+  handleUpdateCanvas = handleUpdateCanvas !== undefined ? handleUpdateCanvas : (() => {});
+  allowedToDraw = allowedToDraw !== undefined ? allowedToDraw :  true;
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [isNewLine, setIsNewLine] = useState(true)
@@ -32,10 +34,13 @@ export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
       if (ctx) {
         ctx.fillStyle = '#FFFFFF'
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+        handleUpdateCanvas(canvas.toDataURL());
       }
     }
 
     socket.on('updateRoomCanvas', (response) => {
+      console.log(response.playerId, user?._id);
       if (response.playerId === user?._id) {
         return;
       }
@@ -44,7 +49,7 @@ export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
         const ctx = canvas.getContext('2d')
         if (ctx) {
           const img = new Image();
-          img.src = response.room.canvas;
+          img.src = response.canvas;
           img.onload = () => {
             ctx.drawImage(img, 0, 0);
           }
@@ -175,6 +180,7 @@ export function DrawingCanvas({ handleUpdateCanvas, allowedToDraw }: any) {
       <button onClick={clearCanvas} disabled={!allowedToDraw} className="btn btn-primary mt-4">
         Clear Canvas
       </button>
+      {handleAdvanceStage && <button type="button" className="btn btn-primary" disabled={!allowedToDraw} onClick={handleAdvanceStage}>Advance stage</button>}
     </div>
   )
 }

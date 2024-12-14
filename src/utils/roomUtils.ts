@@ -75,6 +75,7 @@ export class Game {
 export class GameStage {
   stage: Stage;
   player: Player;
+  ttl: number;
   word: string;
   canvas: string;
   nextStage?: string;
@@ -82,12 +83,14 @@ export class GameStage {
   constructor(
     stage: Stage,
     player: Player,
+    ttl: number = 0,
     word: string = '',
     canvas: string = '',
     nextStage: string|undefined = undefined,
   ) {
     this.stage = stage;
     this.player = player;
+    this.ttl = ttl;
     this.word = word;
     this.canvas = canvas;
     this.nextStage = nextStage;
@@ -97,6 +100,7 @@ export class GameStage {
     return new GameStage(
       gameStage.stage,
       gameStage.player instanceof Player ? gameStage.player : Player.fromObject(gameStage.player),
+      gameStage.ttl,
       gameStage.word,
       gameStage.canvas,
       gameStage.nextStage,
@@ -167,6 +171,8 @@ export class Room {
   isFinished: boolean = false
   owner: Player = new Player()
   maxPlayers: number = 0
+  timeForDrawing: number = 0
+  timeForGuessing: number = 0
   canvas: string = ''
   players: Map<string, Player> = new Map()
   chatHistory: ChatEntry[] = []
@@ -180,6 +186,8 @@ export class Room {
     isFinished: boolean = false,
     owner: Player = new Player(),
     maxPlayers: number = 0,
+    timeForDrawing: number = 0,
+    timeForGuessing: number = 0,
     canvas: string = '',
     players: Map<string, Player> = new Map(),
     chatHistory: ChatEntry[] = [],
@@ -192,6 +200,8 @@ export class Room {
     this.isFinished = isFinished
     this.owner = owner
     this.maxPlayers = maxPlayers
+    this.timeForDrawing = timeForDrawing
+    this.timeForGuessing = timeForGuessing
     this.canvas = canvas
     this.players = players
     this.chatHistory = chatHistory
@@ -220,6 +230,8 @@ export class Room {
       room.isFinished,
       room.owner,
       room.maxPlayers,
+      room.timeForDrawing,
+      room.timeForGuessing,
       room.canvas,
       players,
       room.chatHistory,
@@ -261,6 +273,8 @@ export function createRoom(
   roomName: string,
   isPrivate: boolean,
   maxPlayers: number,
+  timeForDrawing: number,
+  timeForGuessing: number,
   player: Player
 ): void {
   const room = new Room(
@@ -271,6 +285,8 @@ export function createRoom(
     false,
     player,
     maxPlayers,
+    timeForDrawing,
+    timeForGuessing,
     '',
     new Map<string, Player>().set(player._id, player),
   );
