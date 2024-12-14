@@ -13,7 +13,6 @@ export default function Game() {
   const [room, setRoom] = useState(new Room())
   const [canvasData, setCanvasData] = useState('');
   const [guess, setGuess] = useState('');
-  const [countdownStarted, setCountdownStarted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
 
   useEffect(() => {
@@ -37,59 +36,75 @@ export default function Game() {
       }
       const room = Room.fromObject(response.room)
       setRoom(room)
-      setTimeRemaining(room.currentStage()?.stage == Stage.Draw ? room.timeForDrawing : room.timeForGuessing);
-      setCountdownStarted(true);
+      setTimeRemaining(room.currentStage()?.ttl!);
       setPlayers(Object.values(response.room.players))
-      setCanvasData(room.canvas);
+      setCanvasData(room.currentStage()?.canvas!)
     });
 
     socket.on('updateRoom', (response: any) => {
       const room = Room.fromObject(response.room);
+      console.log('updateRoom', room);
       setRoom(room)
-      if (!countdownStarted) {
-        setTimeRemaining(room.currentStage()?.stage == Stage.Draw ? room.timeForDrawing : room.timeForGuessing);
-        setCountdownStarted(true);
-      }
+      setTimeRemaining(room.currentStage()?.ttl!);
       setPlayers(Object.values(response.room.players))
+      setCanvasData(room.currentStage()?.canvas!)
     });
+
+    return () => {
+      socket.off('updateRoom');
+    }
   }, [user, roomCode, navigate])
 
   useEffect(() => {
-    if (countdownStarted) {
-      const countdownInterval = setInterval(() => {
-        if (timeRemaining <= 0) {
-          clearInterval(countdownInterval);
-          handleAdvanceStage();
-          return;
-        }
-        setTimeRemaining(timeRemaining-1);
-      }, 1000);
-
-      return () => clearInterval(countdownInterval);
+    if (!user) {
+      return
     }
-  }, [countdownStarted, timeRemaining])
+
+    setTimeRemaining(room.currentStage()?.ttl!);
+    setPlayers(Object.values(room.players))
+    setCanvasData(room.currentStage()?.canvas!)
+    console.log('room.isFinished', room.isFinished);
+    console.log('room: ', room);
+    console.log('Time left: ', room.currentStage()?.ttl);
+    if (room.isFinished) {
+      socket.off('updateRoom');
+      return;
+    }
+    if (room.currentStage()?.ttl === 0) {
+      console.log('Timer expired');
+
+      console.log('room.currentStage()?.player._id === user._id', room.currentStage()?.player._id === user._id);
+      if (room.currentStage()?.player._id === user._id) {
+        handleAdvanceStage()
+      }
+    }
+  }, [room]);
+
+  useEffect(() => {
+    console.log(canvasData?.length);
+  }, [canvasData])
 
   if (!user || !roomCode) return null;
 
   const handleUpdateCanvas = (canvasData: string) => {
     setCanvasData(canvasData);
-    socket.emit('updateRoomCanvas', { code: room.code, canvas: canvasData, playerId: user._id });
+    socket.emit('updateRoomCanvas', { code: roomCode, canvas: canvasData, playerId: user._id });
   };
 
   const handleLeave = () => {
-    socket.emit('leaveRoom', { code: room.code, player: user }, () => {
+    socket.emit('leaveRoom', { code: roomCode, player: user }, () => {
       navigate('/join-room');
     });
   }
 
   const handleAdvanceStage = () => {
+    console.log('handleAdvanceStage', room, canvasData.length);
     if (room.currentStage()?.stage == Stage.Draw) {
-      socket.emit('advanceStage', { code: room.code, canvas: canvasData });
+      socket.emit('advanceStage', { code: roomCode, canvas: canvasData });
     } else {
-      socket.emit('advanceStage', { code: room.code, guess });
+      socket.emit('advanceStage', { code: roomCode, guess });
     }
     setTimeRemaining(0);
-    setCountdownStarted(false);
   }
 
   return (
@@ -125,7 +140,7 @@ export default function Game() {
               <h3>Guess the drawing</h3>
             )}
             {timeRemaining && <p>Time left: {timeRemaining}</p>}
-            <DrawingCanvas handleUpdateCanvas={handleUpdateCanvas} canvasData={canvasData} allowedToDraw={room.currentStage()?.stage == Stage.Draw && room.currentStage()?.player._id == user._id} />
+            <DrawingCanvas handleUpdateCanvas={handleUpdateCanvas} canvasData={canvasData} handleAdvanceStage={handleAdvanceStage} allowedToDraw={room.currentStage()?.stage == Stage.Draw && room.currentStage()?.player._id == user._id} />
             {room.currentStage()?.stage == Stage.Guess && room.currentStage()?.player._id == user._id && (
               <>
                 <input type="text" value={guess} onChange={(e) => setGuess(e.currentTarget.value)} placeholder="What do you think the drawing represents?" />
@@ -151,8 +166,8 @@ export default function Game() {
                 </li>
               ))}
             </ul>
-            <pre>{JSON.stringify(room.nextStage(), null, 2)}</pre>
-            <button type="button" className="btn btn-primary" disabled={!room.nextStage()} onClick={handleAdvanceStage}>Advance stage</button>
+            {/* <pre>{JSON.stringify(room.nextStage(), null, 2)}</pre> */}
+            {/* <button type="button" className="btn btn-primary" disabled={!room.nextStage()} onClick={handleAdvanceStage}>Advance stage</button> */}
           </div>
         </div>
       )}

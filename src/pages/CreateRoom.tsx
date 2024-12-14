@@ -63,7 +63,7 @@ export default function CreateRoom() {
               className="input input-bordered"
               min={0}
               value={maxPlayers}
-              onChange={(e) => setMaxPlayers(parseInt(e.currentTarget.value))}
+              onChange={(e) => setMaxPlayers(parseInt(e.currentTarget.value || '0'))}
               required
             />
           </div>
@@ -80,7 +80,7 @@ export default function CreateRoom() {
                 min={0}
                 max={120}
                 value={timeForDrawing}
-                onChange={(e) => setTimeForDrawing(parseInt(e.target.value))}
+                onChange={(e) => setTimeForDrawing(parseInt(e.currentTarget.value || '0'))}
                 required
               />
             </div>
@@ -98,7 +98,7 @@ export default function CreateRoom() {
                 min={0}
                 max={60}
                 value={timeForGuessing}
-                onChange={(e) => setTimeForGuessing(parseInt(e.target.value))}
+                onChange={(e) => setTimeForGuessing(parseInt(e.currentTarget.value || '0'))}
                 required
               />
             </div>

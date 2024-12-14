@@ -75,6 +75,7 @@ export class Game {
 export class GameStage {
   stage: Stage;
   player: Player;
+  ttl: number;
   word: string;
   canvas: string;
   nextStage?: string;
@@ -82,12 +83,14 @@ export class GameStage {
   constructor(
     stage: Stage,
     player: Player,
+    ttl: number = 0,
     word: string = '',
     canvas: string = '',
     nextStage: string|undefined = undefined,
   ) {
     this.stage = stage;
     this.player = player;
+    this.ttl = ttl;
     this.word = word;
     this.canvas = canvas;
     this.nextStage = nextStage;
@@ -97,6 +100,7 @@ export class GameStage {
     return new GameStage(
       gameStage.stage,
       gameStage.player instanceof Player ? gameStage.player : Player.fromObject(gameStage.player),
+      gameStage.ttl,
       gameStage.word,
       gameStage.canvas,
       gameStage.nextStage,
