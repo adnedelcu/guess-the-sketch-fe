@@ -37,7 +37,7 @@ export default function Game() {
       const room = Room.fromObject(response.room)
       setRoom(room)
       setTimeRemaining(room.currentStage()?.ttl!);
-      setPlayers(Object.values(response.room.players))
+      setPlayers([...room.players.values()])
       setCanvasData(room.currentStage()?.canvas!)
     });
 
@@ -46,7 +46,7 @@ export default function Game() {
       // console.log('updateRoom', room);
       setRoom(room)
       setTimeRemaining(room.currentStage()?.ttl!);
-      setPlayers(Object.values(response.room.players))
+      setPlayers([...room.players.values()])
       setCanvasData(room.currentStage()?.canvas!)
     });
 
@@ -61,7 +61,7 @@ export default function Game() {
     }
 
     setTimeRemaining(room.currentStage()?.ttl!);
-    setPlayers(Object.values(room.players))
+    setPlayers([...room.players.values()])
     setCanvasData(room.currentStage()?.canvas!)
     // console.log('room.isFinished', room.isFinished);
     // console.log('room: ', room);

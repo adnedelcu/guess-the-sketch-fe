@@ -154,14 +154,15 @@ export default function Lobby() {
             <div className="space-y-4">
               {players.map(player => (
                 <div key={player._id} className="flex justify-between items-center">
-                  <span>{player.firstName} {player.lastName}{player._id === user._id ? ' (You)' : ''}</span>
-                  {player._id === user._id ? (
+                  <span>{player.firstName} {player.lastName} {player.ready ? "✅" : "❌"}{player._id === user._id ? ' (You)' : ''}</span>
+                  <label></label>
+                  {player._id === user._id &&
                     <div className="actions">
                       <button
                         onClick={() => handleReady()}
                         className={`btn ${player.ready ? 'btn-primary' : 'btn-outline'}`}
                       >
-                        {player.ready ? "Ready" : "Not Ready"}
+                        Toggle ready
                       </button>
                       <button
                         onClick={() => handleLeave()}
@@ -170,9 +171,7 @@ export default function Lobby() {
                         Leave room
                       </button>
                     </div>
-                  ) : (
-                    <label>{player.ready ? "Ready" : "Not Ready"}</label>
-                  )}
+                  }
                 </div>
               ))}
             </div>
