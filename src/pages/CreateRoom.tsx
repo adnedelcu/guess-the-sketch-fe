@@ -71,7 +71,7 @@ export default function CreateRoom() {
               <span className="label-text">Private Room</span>
               <input
                 type="checkbox"
-                className="toggle toggle-primary"
+                className=""
                 checked={isPrivate}
                 onChange={(e) => setIsPrivate(e.target.checked)}
               />

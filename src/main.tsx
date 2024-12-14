@@ -1,8 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App'
-import './index.css'
 import { injectSpeedInsights } from '@vercel/speed-insights';
+import App from './App'
+import "@fontsource/short-stack"
+import 'doodle.css/doodle.css'
+import './index.css'
 
 injectSpeedInsights();
 

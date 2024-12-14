@@ -202,12 +202,12 @@ export default function Lobby() {
                       )
                     })}
                   </div>
-                </div>
-                <div className="pb-6 w-full self-end form-control">
-                  <div className="input-group">
-                    <input type="text" placeholder="Type here" className="input input-bordered max-w-xs" disabled={!socket} value={message} onChange={(event) => setMessage(event.target.value)} />
-                    <button type="button" className="btn btn-primary" disabled={!socket || message.trim().length === 0} onClick={sendMessage}>Submit✨</button>
-                    <button type="button" className="btn btn-primary" disabled={!socket || !allowedToBuzz} onClick={sendBuzz}>🐝</button>
+                  <div className="pb-4 w-full self-end form-control">
+                    <div className="m-auto input-group">
+                      <input type="text" placeholder="Type here" className="input input-bordered p-0 max-w-xs" disabled={!socket} value={message} onChange={(event) => setMessage(event.target.value)} />
+                      <button type="button" className="btn btn-primary" disabled={!socket || message.trim().length === 0} onClick={sendMessage}>Submit</button>
+                      <button type="button" className="btn btn-primary" disabled={!socket || !allowedToBuzz} onClick={sendBuzz}>🐝</button>
+                    </div>
                   </div>
                 </div>
               </div>

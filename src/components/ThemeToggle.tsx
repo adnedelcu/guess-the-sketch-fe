@@ -7,7 +7,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="btn btn-ghost btn-circle"
+      className="btn btn-ghost"
       aria-label="Toggle theme"
     >
       {theme === 'business' ? (
