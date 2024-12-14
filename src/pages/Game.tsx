@@ -43,7 +43,7 @@ export default function Game() {
 
     socket.on('updateRoom', (response: any) => {
       const room = Room.fromObject(response.room);
-      console.log('updateRoom', room);
+      // console.log('updateRoom', room);
       setRoom(room)
       setTimeRemaining(room.currentStage()?.ttl!);
       setPlayers(Object.values(response.room.players))
@@ -63,17 +63,17 @@ export default function Game() {
     setTimeRemaining(room.currentStage()?.ttl!);
     setPlayers(Object.values(room.players))
     setCanvasData(room.currentStage()?.canvas!)
-    console.log('room.isFinished', room.isFinished);
-    console.log('room: ', room);
-    console.log('Time left: ', room.currentStage()?.ttl);
+    // console.log('room.isFinished', room.isFinished);
+    // console.log('room: ', room);
+    // console.log('Time left: ', room.currentStage()?.ttl);
     if (room.isFinished) {
       socket.off('updateRoom');
       return;
     }
     if (room.currentStage()?.ttl === 0) {
-      console.log('Timer expired');
+      // console.log('Timer expired');
 
-      console.log('room.currentStage()?.player._id === user._id', room.currentStage()?.player._id === user._id);
+      // console.log('room.currentStage()?.player._id === user._id', room.currentStage()?.player._id === user._id);
       if (room.currentStage()?.player._id === user._id) {
         handleAdvanceStage()
       }
@@ -81,7 +81,7 @@ export default function Game() {
   }, [room]);
 
   useEffect(() => {
-    console.log(canvasData?.length);
+    // console.log(canvasData?.length);
   }, [canvasData])
 
   if (!user || !roomCode) return null;
@@ -98,7 +98,7 @@ export default function Game() {
   }
 
   const handleAdvanceStage = () => {
-    console.log('handleAdvanceStage', room, canvasData.length);
+    // console.log('handleAdvanceStage', room, canvasData.length);
     if (room.currentStage()?.stage == Stage.Draw) {
       socket.emit('advanceStage', { code: roomCode, canvas: canvasData });
     } else {
