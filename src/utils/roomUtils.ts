@@ -1,5 +1,6 @@
-import { User } from "../contexts/AuthContext";
+import * as uuid from 'uuid';
 import { io } from 'socket.io-client';
+import { User } from "../contexts/AuthContext";
 
 const WS_URL = import.meta.env.VITE_API_URL;
 export const socket = io(WS_URL);
@@ -36,6 +37,73 @@ socket.on('disconnect', function() {
   socket.off('updateRoomCanvas');
   socket.off('updateChatHistory');
 });
+
+const animals: string[] = [
+  "alligator",
+  "anteater",
+  "armadillo",
+  "badger",
+  "bat",
+  "bear",
+  "beaver",
+  "buffalo",
+  "camel",
+  "chameleon",
+  "cheetah",
+  "chipmunk",
+  "chinchilla",
+  "chupacabra",
+  "coyote",
+  "crow",
+  "dinosaur",
+  "dog",
+  "dolphin",
+  "dragon",
+  "duck",
+  "elephant",
+  "fox",
+  "frog",
+  "giraffe",
+  "goose",
+  "grizzly",
+  "hamster",
+  "hedgehog",
+  "hippo",
+  "hyena",
+  "jackal",
+  "iguana",
+  "kangaroo",
+  "kiwi",
+  "koala",
+  "kraken",
+  "leopard",
+  "liger",
+  "lion",
+  "llama",
+  "monkey",
+  "moose",
+  "nyan cat",
+  "orangutan",
+  "otter",
+  "panda",
+  "penguin",
+  "platypus",
+  "python",
+  "pumpkin",
+  "quagga",
+  "quokka",
+  "rabbit",
+  "raccoon",
+  "rhino",
+  "sheep",
+  "skunk",
+  "squirrel",
+  "tiger",
+  "turtle",
+  "unicorn",
+  "walrus",
+  "wolf",
+];
 
 export enum Stage {
   Draw = 'draw',
@@ -149,6 +217,19 @@ export class Player {
       user.birthday,
       false
     )
+  }
+
+  static generateRandom() {
+    const animal = animals[Math.floor(Math.random() * animals.length)];
+
+    return new Player(
+      uuid.v4(),
+      'Anonymous',
+      animal,
+      `anonymous.${animal}@guess-the-sketch.com`,
+      new Date(),
+      false
+    );
   }
 
   static fromObject(player: any): Player {

@@ -17,13 +17,13 @@ export default function Header() {
           <Link to="/leaderboard" className="btn btn-ghost">
             Leaderboard
           </Link>
+          <Link to="/join-room" className="btn btn-ghost">
+            Join Room
+          </Link>
           {user ? (
             <>
               <Link to="/create-room" className="btn btn-ghost">
                 Create Room
-              </Link>
-              <Link to="/join-room" className="btn btn-ghost">
-                Join Room
               </Link>
               <Link to="/profile" className="btn btn-ghost">
                 Profile

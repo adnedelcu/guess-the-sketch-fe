@@ -10,6 +10,7 @@ export type User = {
 
 export type AuthContextType = {
   user: User | null
+  setUser: (user: User | null) => void
   login: (token: string, user: User) => void
   logout: () => void
 }
@@ -43,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

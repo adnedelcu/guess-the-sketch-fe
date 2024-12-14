@@ -40,7 +40,6 @@ export function DrawingCanvas({ handleUpdateCanvas, handleAdvanceStage, allowedT
     }
 
     socket.on('updateRoomCanvas', (response) => {
-      console.log(response.playerId, user?._id);
       if (response.playerId === user?._id) {
         return;
       }

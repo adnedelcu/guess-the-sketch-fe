@@ -12,7 +12,7 @@ export default function JoinRoom() {
   const [isJoining, setIsJoining] = useState(false)
   const [canRefresh, setCanRefresh] = useState(false)
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
 
   useEffect(() => {
     getRooms()
@@ -38,10 +38,6 @@ export default function JoinRoom() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) {
-      navigate('/login')
-      return
-    }
 
     setIsJoining(true)
     setError('')
@@ -51,7 +47,14 @@ export default function JoinRoom() {
 
     try {
       const formattedCode = code.toUpperCase().trim()
-      socket.emit('joinRoom', { code: formattedCode, player: Player.createFromUser(user) }, (response: any) => {
+      let player;
+      if (!user) {
+        player = Player.generateRandom();
+        setUser(player);
+      } else {
+        player = Player.createFromUser(user);
+      }
+      socket.emit('joinRoom', { code: formattedCode, player: player }, (response: any) => {
         if (response.error) {
           if (response.errorCode == ErrorCodes.PlayerAlreadyInRoom) {
             navigate(`/lobby/${formattedCode}`)
