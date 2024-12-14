@@ -12,20 +12,24 @@ const stages = [
     content: "Use the drawing tools to create a sketch that represents the given word. You have 60 seconds to complete your masterpiece!"
   },
   {
-    title: "4. Others Guess",
-    content: "While you're drawing, other players try to guess the word based on your sketch. They can type their guesses in the chat."
+    title: "4. Other Guess",
+    content: "When you're done drawing, another player tries to guess the word based on your sketch. They have 10 seconds to submit their guess."
   },
   {
-    title: "5. Scoring",
-    content: "Points are awarded to the first player who guesses correctly and to the artist if someone guesses the word."
+    title: "5. Repeat",
+    content: "The role of the artist rotates to the next player, except the new artist needs to draw what the previous player guessed instead of the original word."
   },
   {
-    title: "6. Next Round",
-    content: "The role of the artist rotates to the next player, and a new round begins with a new word."
+    title: "6. Game End",
+    content: "The game continues until every player has either guessed or drawn."
   },
   {
-    title: "7. Game End",
-    content: "The game continues for a set number of rounds or until a player reaches a target score. The player with the highest score wins!"
+    title: "7. Voting",
+    content: "Each player anonymously votes for the drawing that best matches the original word."
+  },
+  {
+    title: "8. Scoring",
+    content: "Points are awarded to the artist who got the most votes and to the players who voted for him."
   }
 ]
 

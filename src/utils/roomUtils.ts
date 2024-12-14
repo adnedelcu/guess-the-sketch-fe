@@ -105,6 +105,56 @@ const animals: string[] = [
   "wolf",
 ];
 
+const actions: string[] = [
+  "drawing",
+  "eating",
+  "singing",
+  "walking on",
+];
+
+const objects: string[] = [
+  "apple",
+  "bottle of lotion",
+  "blowdryer",
+  "bracelet",
+  "bread",
+  "card",
+  "cell phone",
+  "coffee mug",
+  "cowboy hat",
+  "guitar",
+  "jump rope",
+  "mobile phone",
+  "pair of pants",
+  "paper",
+  "pencil",
+  "ring",
+  "pair of rubber gloves",
+  "scotch tape",
+  "sketch pad",
+  "sticky note",
+];
+
+export const randomAnimal = (): string => {
+  return animals[Math.floor(Math.random() * animals.length)];
+}
+
+export const randomAction = (): string => {
+  return actions[Math.floor(Math.random() * actions.length)];
+}
+
+export const randomObject = (): string => {
+  return objects[Math.floor(Math.random() * objects.length)];
+}
+
+export const randomSentence = (): string => {
+  const animal = randomAnimal();
+  const action = randomAction();
+  const object = randomObject();
+
+  return `${animal} ${action} ${object[0] == 'a' ? `an ${object}` : `a ${object}`}`;
+}
+
 export enum Stage {
   Draw = 'draw',
   Guess = 'guess',
